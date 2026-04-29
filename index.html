@@ -2,62 +2,161 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Live Shared Database</title>
+    
+    <style>
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Container Utama (Card) */
+        .app-container {
+            background: white;
+            width: 100%;
+            max-width: 400px;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        h2 {
+            color: #1c1e21;
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Tampilan Data */
+        .display-box {
+            background: #e7f3ff;
+            color: #1877f2;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+            word-wrap: break-word;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #1877f2;
+        }
+
+        /* Form Elements */
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #1877f2;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: #1877f2;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.3s;
+            -webkit-tap-highlight-color: transparent; /* Hilangkan highlight biru di HP */
+        }
+
+        button:active {
+            transform: scale(0.98);
+            background-color: #166fe5;
+        }
+
+        .footer-note {
+            margin-top: 15px;
+            font-size: 0.8rem;
+            color: #65676b;
+        }
+    </style>
 </head>
 <body>
 
-    <h2>Data Bersama: <span id="data-display">Loading...</span></h2>
-    <input type="text" id="input-data" placeholder="Ketik sesuatu...">
-    <button onclick="updateData()">Update Data ke Teman</button>
+    <div class="app-container">
+        <h2>Data Bersama</h2>
+        
+        <div class="display-box">
+            <span id="data-display">Loading...</span>
+        </div>
+
+        <input type="text" id="input-data" placeholder="Ketik pesan untuk teman..." autocomplete="off">
+        <button onclick="updateData()">Kirim Update</button>
+        
+        <p class="footer-note">Data tersinkronisasi secara realtime</p>
+    </div>
 
     <script type="module">
-    // 1. Import library yang dibutuhkan (App dan Database)
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // 2. Konfigurasi Anda
-    const firebaseConfig = {
-        apiKey: "AIzaSyDd1_GfXEAubvEym0mYkXiz8SUZ35FtodY",
-        authDomain: "databersama.firebaseapp.com",
-        databaseURL: "https://databersama-default-rtdb.firebaseio.com",
-        projectId: "databersama",
-        storageBucket: "databersama.firebasestorage.app",
-        messagingSenderId: "699549114383",
-        appId: "1:699549114383:web:b9ab06c4c472e548db437a"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyDd1_GfXEAubvEym0mYkXiz8SUZ35FtodY",
+            authDomain: "databersama.firebaseapp.com",
+            databaseURL: "https://databersama-default-rtdb.firebaseio.com",
+            projectId: "databersama",
+            storageBucket: "databersama.firebasestorage.app",
+            messagingSenderId: "699549114383",
+            appId: "1:699549114383:web:b9ab06c4c472e548db437a"
+        };
 
-    // 3. Inisialisasi Firebase & Database
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-    const dataRef = ref(db, 'pesan_bersama'); // Jalur data di database
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const dataRef = ref(db, 'pesan_bersama');
 
-    // 4. Menerima Data secara Live (Realtime)
-    // Setiap kali data di Firebase berubah, teks di layar akan langsung update
-    onValue(dataRef, (snapshot) => {
-        const data = snapshot.val();
-        document.getElementById('data-display').innerText = data || "(Kosong)";
-    });
+        // Listener Realtime
+        onValue(dataRef, (snapshot) => {
+            const data = snapshot.val();
+            document.getElementById('data-display').innerText = data || "(Kosong)";
+        });
 
-    // 5. Mengirim Data (Update Data)
-    // Karena menggunakan type="module", kita tempelkan fungsi ke objek 'window' 
-    // agar bisa dipanggil oleh tombol HTML
-    window.updateData = function() {
-        const inputElement = document.getElementById('input-data');
-        const newValue = inputElement.value;
-        
-        if(newValue.trim() !== "") {
-            set(dataRef, newValue)
-                .then(() => {
-                    inputElement.value = ""; // Kosongkan input setelah kirim
-                    console.log("Data berhasil dikirim!");
-                })
-                .catch((error) => {
-                    console.error("Gagal mengirim:", error);
-                    alert("Gagal! Pastikan Rules di Firebase sudah 'Test Mode'");
-                });
-        }
-    };
-</script>
+        // Fungsi Update
+        window.updateData = function() {
+            const inputElement = document.getElementById('input-data');
+            const newValue = inputElement.value;
+            
+            if(newValue.trim() !== "") {
+                set(dataRef, newValue)
+                    .then(() => {
+                        inputElement.value = "";
+                    })
+                    .catch((error) => {
+                        console.error("Error:", error);
+                        alert("Gagal update! Cek koneksi atau Rules Firebase.");
+                    });
+            }
+        };
+    </script>
 
 </body>
 </html>
