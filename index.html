@@ -3,160 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Shared Database</title>
-    
+    <title>Laporan Ibadah Realtime - GKA Manado</title>
     <style>
-        /* Reset & Base Styles */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --bg: #f4f7f6;
+            --white: #ffffff;
         }
 
-        body {
-            background-color: #f0f2f5;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { background-color: var(--bg); padding: 15px; color: #333; }
 
-        /* Container Utama (Card) */
-        .app-container {
-            background: white;
-            width: 100%;
-            max-width: 400px;
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            text-align: center;
-        }
+        .container { max-width: 500px; margin: auto; }
 
-        h2 {
-            color: #1c1e21;
-            font-size: 1.2rem;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Tampilan Data */
-        .display-box {
-            background: #e7f3ff;
-            color: #1877f2;
+        /* Card Style */
+        .card {
+            background: var(--white);
             padding: 20px;
             border-radius: 15px;
-            font-size: 1.5rem;
-            font-weight: bold;
-            margin-bottom: 25px;
-            word-wrap: break-word;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px dashed #1877f2;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
 
-        /* Form Elements */
-        input[type="text"] {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            font-size: 1rem;
-            margin-bottom: 15px;
-            outline: none;
-            transition: border-color 0.3s;
-        }
+        h1 { font-size: 1.1rem; text-align: center; margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        
+        h3 { font-size: 0.9rem; margin: 15px 0 10px; color: var(--accent); text-transform: uppercase; }
 
-        input[type="text"]:focus {
-            border-color: #1877f2;
+        /* Form Styling */
+        .input-group { margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
+        label { font-size: 0.85rem; flex: 1; }
+        input { 
+            width: 80px; padding: 8px; border: 1px solid #ddd; border-radius: 8px; 
+            text-align: center; font-weight: bold; outline: none;
+        }
+        input:focus { border-color: var(--accent); }
+
+        .total-row { 
+            background: #f9f9f9; padding: 10px; border-radius: 8px; 
+            margin-top: 5px; font-weight: bold; display: flex; justify-content: space-between;
+            border-left: 4px solid var(--accent);
         }
 
         button {
-            width: 100%;
-            padding: 15px;
-            background-color: #1877f2;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.1s, background-color 0.3s;
-            -webkit-tap-highlight-color: transparent; /* Hilangkan highlight biru di HP */
+            width: 100%; padding: 15px; background: var(--accent); color: white;
+            border: none; border-radius: 12px; font-weight: bold; font-size: 1rem;
+            margin-top: 20px; cursor: pointer; transition: 0.3s;
         }
+        button:active { transform: scale(0.98); background: #2980b9; }
 
-        button:active {
-            transform: scale(0.98);
-            background-color: #166fe5;
-        }
-
-        .footer-note {
-            margin-top: 15px;
-            font-size: 0.8rem;
-            color: #65676b;
-        }
+        /* Preview Display */
+        .preview { background: #fffbe6; border: 1px solid #ffe58f; }
+        .report-text { white-space: pre-wrap; font-size: 0.85rem; line-height: 1.6; }
     </style>
 </head>
 <body>
 
-    <div class="app-container">
-        <h2>Data Bersama</h2>
+<div class="container">
+    <div class="card">
+        <h1>ISI LAPORAN MINGGU RAYA</h1>
         
-        <div class="display-box">
-            <span id="data-display">Loading...</span>
+        <div class="input-group">
+            <label>Tgl/Bln:</label>
+            <input type="text" id="tgl" style="width: 150px;" placeholder="Minggu, 26 April">
         </div>
 
-        <input type="text" id="input-data" placeholder="Ketik pesan untuk teman..." autocomplete="off">
-        <button onclick="updateData()">Kirim Update</button>
-        
-        <p class="footer-note">Data tersinkronisasi secara realtime</p>
+        <h3>1. Ibadah Umum Onsite</h3>
+        <div class="input-group"><label>Jibar:</label><input type="number" id="u_jibar" class="calc"></div>
+        <div class="input-group"><label>Tamu:</label><input type="number" id="u_tamu" class="calc"></div>
+        <div class="input-group"><label>PelTu:</label><input type="number" id="u_peltu" class="calc"></div>
+        <div class="input-group"><label>Jemaat:</label><input type="number" id="u_jemaat" class="calc"></div>
+        <div class="total-row"><span>Total Umum:</span><span id="u_total">0</span></div>
+
+        <h3>2. Ibadah Youth Teens</h3>
+        <div class="input-group"><label>Jibar:</label><input type="number" id="yt_jibar" class="calc"></div>
+        <div class="input-group"><label>Jemaat:</label><input type="number" id="yt_jemaat" class="calc"></div>
+        <div class="input-group"><label>PelTu YT:</label><input type="number" id="yt_peltu" class="calc"></div>
+        <div class="total-row"><span>Total YT:</span><span id="yt_total">0</span></div>
+
+        <h3>3. Ibadah Kids Onsite</h3>
+        <div class="input-group"><label>Jibar:</label><input type="number" id="k_jibar" class="calc"></div>
+        <div class="input-group"><label>Jemaat:</label><input type="number" id="k_jemaat" class="calc"></div>
+        <div class="input-group"><label>Pel Anak:</label><input type="number" id="k_pel" class="calc"></div>
+        <div class="total-row"><span>Total Kids:</span><span id="k_total">0</span></div>
+
+        <div class="total-row" style="background: var(--primary); color: white; margin-top: 20px;">
+            <span>GRAND TOTAL JEMAAT:</span><span id="grand_total">0</span>
+        </div>
+
+        <button onclick="kirimLaporan()">Update Laporan Ke Teman</button>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+    <div class="card preview">
+        <h3>Live Preview (Dilihat Teman)</h3>
+        <div id="report-output" class="report-text">Menunggu data...</div>
+    </div>
+</div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDd1_GfXEAubvEym0mYkXiz8SUZ35FtodY",
-            authDomain: "databersama.firebaseapp.com",
-            databaseURL: "https://databersama-default-rtdb.firebaseio.com",
-            projectId: "databersama",
-            storageBucket: "databersama.firebasestorage.app",
-            messagingSenderId: "699549114383",
-            appId: "1:699549114383:web:b9ab06c4c472e548db437a"
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDd1_GfXEAubvEym0mYkXiz8SUZ35FtodY",
+        authDomain: "databersama.firebaseapp.com",
+        databaseURL: "https://databersama-default-rtdb.firebaseio.com",
+        projectId: "databersama",
+        storageBucket: "databersama.firebasestorage.app",
+        messagingSenderId: "699549114383",
+        appId: "1:699549114383:web:b9ab06c4c472e548db437a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const reportRef = ref(db, 'laporan_ibadah');
+
+    // LOGIKA PERHITUNGAN OTOMATIS
+    const inputs = document.querySelectorAll('.calc');
+    inputs.forEach(input => {
+        input.addEventListener('input', hitungTotal);
+    });
+
+    function hitungTotal() {
+        const u = Number(document.getElementById('u_jibar').value) + Number(document.getElementById('u_tamu').value) + Number(document.getElementById('u_peltu').value) + Number(document.getElementById('u_jemaat').value);
+        const yt = Number(document.getElementById('yt_jibar').value) + Number(document.getElementById('yt_jemaat').value) + Number(document.getElementById('yt_peltu').value);
+        const k = Number(document.getElementById('k_jibar').value) + Number(document.getElementById('k_jemaat').value) + Number(document.getElementById('k_pel').value);
+        
+        document.getElementById('u_total').innerText = u;
+        document.getElementById('yt_total').innerText = yt;
+        document.getElementById('k_total').innerText = k;
+        document.getElementById('grand_total').innerText = u + yt + k;
+    }
+
+    // KIRIM DATA KE FIREBASE
+    window.kirimLaporan = function() {
+        const data = {
+            tgl: document.getElementById('tgl').value || "Minggu, ...",
+            u_jibar: document.getElementById('u_jibar').value || 0,
+            u_tamu: document.getElementById('u_tamu').value || 0,
+            u_peltu: document.getElementById('u_peltu').value || 0,
+            u_jemaat: document.getElementById('u_jemaat').value || 0,
+            u_total: document.getElementById('u_total').innerText,
+            yt_jibar: document.getElementById('yt_jibar').value || 0,
+            yt_jemaat: document.getElementById('yt_jemaat').value || 0,
+            yt_peltu: document.getElementById('yt_peltu').value || 0,
+            yt_total: document.getElementById('yt_total').innerText,
+            k_jibar: document.getElementById('k_jibar').value || 0,
+            k_jemaat: document.getElementById('k_jemaat').value || 0,
+            k_pel: document.getElementById('k_pel').value || 0,
+            k_total: document.getElementById('k_total').innerText,
+            grand_total: document.getElementById('grand_total').innerText
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const dataRef = ref(db, 'pesan_bersama');
+        set(reportRef, data).then(() => alert("Laporan Terkirim!"));
+    };
 
-        // Listener Realtime
-        onValue(dataRef, (snapshot) => {
-            const data = snapshot.val();
-            document.getElementById('data-display').innerText = data || "(Kosong)";
-        });
+    // TERIMA DATA LIVE
+    onValue(reportRef, (snapshot) => {
+        const d = snapshot.val();
+        if (d) {
+            const formatLaporan = `*Laporan Ibadah Minggu Raya GKA Manado*
+pk 10.00 (pagi) dan pk. 14.00
+tgl/bln : ${d.tgl}
 
-        // Fungsi Update
-        window.updateData = function() {
-            const inputElement = document.getElementById('input-data');
-            const newValue = inputElement.value;
-            
-            if(newValue.trim() !== "") {
-                set(dataRef, newValue)
-                    .then(() => {
-                        inputElement.value = "";
-                    })
-                    .catch((error) => {
-                        console.error("Error:", error);
-                        alert("Gagal update! Cek koneksi atau Rules Firebase.");
-                    });
-            }
-        };
-    </script>
+*1. Ibadah Umum Onsite*
+- Jumlah Jibar : ${d.u_jibar} org
+- Jumlah Tamu : ${d.u_tamu} org
+- Jumlah PelTu : ${d.u_peltu} org
+- Jumlah Jemaat : ${d.u_jemaat} org
+Total jumlah : ${d.u_total} org
+
+*2. Ibadah Youth Teens*
+- Jumlah Jibar : ${d.yt_jibar} org
+- Jumlah Jemaat : ${d.yt_jemaat} org
+- Jumlah Peltu YT : ${d.yt_peltu} org
+Total jumlah : ${d.yt_total} org
+
+*3. Ibadah Kids Onsite*
+- Jumlah Jibar : ${d.k_jibar} org
+- Jumlah Jemaat : ${d.k_jemaat} org
+- Kakak Pel Anak : ${d.k_pel} org
+Total jumlah : ${d.k_total} org
+
+*Total Ibadah Umum, YT, Kids : ${d.grand_total} jemaat*
+
+Tuhan Yesus memberkati`;
+
+            document.getElementById('report-output').innerText = formatLaporan;
+        }
+    });
+</script>
 
 </body>
 </html>
