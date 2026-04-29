@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Live Shared Database</title>
+</head>
+<body>
+
+    <h2>Data Bersama: <span id="data-display">Loading...</span></h2>
+    <input type="text" id="input-data" placeholder="Ketik sesuatu...">
+    <button onclick="updateData()">Update Data ke Teman</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // Konfigurasi Firebase Anda (Dapatkan dari Firebase Console)
+        const firebaseConfig = {
+            apiKey: "AIzaSy...",
+            authDomain: "proyek-anda.firebaseapp.com",
+            databaseURL: "https://proyek-anda.firebaseio.com",
+            projectId: "proyek-anda",
+            storageBucket: "proyek-anda.appspot.com",
+            messagingSenderId: "12345",
+            appId: "1:12345:web:abcde"
+        };
+
+        // Inisialisasi Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const dataRef = ref(db, 'pesan_bersama');
+
+        // 1. MENDENGARKAN PERUBAHAN (Live Update)
+        onValue(dataRef, (snapshot) => {
+            const data = snapshot.val();
+            document.getElementById('data-display').innerText = data;
+        });
+
+        // 2. MENGIRIM DATA (Update ke Database)
+        window.updateData = function() {
+            const newValue = document.getElementById('input-data').value;
+            set(dataRef, newValue);
+        };
+    </script>
+</body>
+</html>
