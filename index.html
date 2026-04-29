@@ -11,28 +11,52 @@
     <button onclick="updateData()">Update Data ke Teman</button>
 
     <script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+    // 1. Import library yang dibutuhkan (App dan Database)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyDd1_GfXEAubvEym0mYkXiz8SUZ35FtodY",
-    authDomain: "databersama.firebaseapp.com",
-    databaseURL: "https://databersama-default-rtdb.firebaseio.com",
-    projectId: "databersama",
-    storageBucket: "databersama.firebasestorage.app",
-    messagingSenderId: "699549114383",
-    appId: "1:699549114383:web:b9ab06c4c472e548db437a",
-    measurementId: "G-QKH6ZWVPVJ"
-  };
+    // 2. Konfigurasi Anda
+    const firebaseConfig = {
+        apiKey: "AIzaSyDd1_GfXEAubvEym0mYkXiz8SUZ35FtodY",
+        authDomain: "databersama.firebaseapp.com",
+        databaseURL: "https://databersama-default-rtdb.firebaseio.com",
+        projectId: "databersama",
+        storageBucket: "databersama.firebasestorage.app",
+        messagingSenderId: "699549114383",
+        appId: "1:699549114383:web:b9ab06c4c472e548db437a"
+    };
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
+    // 3. Inisialisasi Firebase & Database
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const dataRef = ref(db, 'pesan_bersama'); // Jalur data di database
+
+    // 4. Menerima Data secara Live (Realtime)
+    // Setiap kali data di Firebase berubah, teks di layar akan langsung update
+    onValue(dataRef, (snapshot) => {
+        const data = snapshot.val();
+        document.getElementById('data-display').innerText = data || "(Kosong)";
+    });
+
+    // 5. Mengirim Data (Update Data)
+    // Karena menggunakan type="module", kita tempelkan fungsi ke objek 'window' 
+    // agar bisa dipanggil oleh tombol HTML
+    window.updateData = function() {
+        const inputElement = document.getElementById('input-data');
+        const newValue = inputElement.value;
+        
+        if(newValue.trim() !== "") {
+            set(dataRef, newValue)
+                .then(() => {
+                    inputElement.value = ""; // Kosongkan input setelah kirim
+                    console.log("Data berhasil dikirim!");
+                })
+                .catch((error) => {
+                    console.error("Gagal mengirim:", error);
+                    alert("Gagal! Pastikan Rules di Firebase sudah 'Test Mode'");
+                });
+        }
+    };
 </script>
 </body>
 </html>
