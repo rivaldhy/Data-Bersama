@@ -2,102 +2,165 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Ibadah Realtime - GKA Manado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>KAM DATABASE - GKA Manado</title>
     <style>
         :root {
-            --primary: #2c3e50;
-            --accent: #3498db;
-            --bg: #f4f7f6;
-            --white: #ffffff;
+            --primary: #2c3e50; --accent: #3498db; --bg: #f0f3f5;
+            --white: #ffffff; --success: #2ecc71; --danger: #e74c3c;
+            --text-muted: #7f8c8d;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, system-ui, sans-serif; }
+        body { background-color: var(--bg); color: var(--primary); padding-bottom: 140px; }
+        .container { max-width: 450px; margin: auto; padding: 15px; }
+
+        /* Nav Tab */
+        .nav-tabs { display: flex; background: var(--white); margin: -15px -15px 20px; padding: 10px; border-bottom: 1px solid #ddd; position: sticky; top: 0; z-index: 1100; }
+        .nav-tabs button { flex: 1; padding: 12px; border: none; background: none; font-weight: 800; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        .nav-tabs button.active { background: var(--primary); color: white; }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { font-size: 1.3rem; font-weight: 800; margin-bottom: 10px; color: var(--primary); }
         
-        body { background-color: var(--bg); padding: 15px; color: #333; }
-
-        .container { max-width: 500px; margin: auto; }
-
-        /* Card Style */
-        .card {
-            background: var(--white);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+        .tgl-input { 
+            width: 100%; padding: 15px; border: 2px solid #dcdde1; border-radius: 12px; 
+            text-align: center; font-size: 1.1rem; font-weight: 700; background: var(--white);
+            color: var(--accent); cursor: pointer; outline: none;
         }
 
-        h1 { font-size: 1.1rem; text-align: center; margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
+        .card { 
+            background: var(--white); border-radius: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.02); 
+            margin-bottom: 15px; border: 1px solid rgba(0,0,0,0.05); overflow: hidden; 
+        }
+
+        .section-header { 
+            background: #fafbfc; padding: 12px 18px; display: flex; 
+            justify-content: space-between; align-items: center; border-bottom: 1px solid #f1f2f6; 
+        }
+        .section-header h3 { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); letter-spacing: 1px; }
+        .badge { background: var(--accent); color: white; padding: 2px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; }
+
+        .section-content { padding: 18px; }
+
+        .grid-input { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+        .input-box { display: flex; flex-direction: column; align-items: center; }
+        .input-box label { font-size: 0.65rem; font-weight: 800; color: var(--text-muted); margin-bottom: 5px; text-transform: uppercase; text-align: center; }
         
-        h3 { font-size: 0.9rem; margin: 15px 0 10px; color: var(--accent); text-transform: uppercase; }
-
-        /* Form Styling */
-        .input-group { margin-bottom: 10px; display: flex; align-items: center; justify-content: space-between; }
-        label { font-size: 0.85rem; flex: 1; }
-        input { 
-            width: 80px; padding: 8px; border: 1px solid #ddd; border-radius: 8px; 
-            text-align: center; font-weight: bold; outline: none;
+        input[type="number"], input[type="text"] { 
+            width: 100%; padding: 12px; border: 1.5px solid #f1f2f6; border-radius: 10px; 
+            font-size: 1.1rem; background: #f8f9fa; text-align: center; transition: all 0.2s ease;
         }
-        input:focus { border-color: var(--accent); }
+        input:focus { background: #fff; border-color: var(--accent); outline: none; }
 
-        .total-row { 
-            background: #f9f9f9; padding: 10px; border-radius: 8px; 
-            margin-top: 5px; font-weight: bold; display: flex; justify-content: space-between;
-            border-left: 4px solid var(--accent);
+        .jb-item { background: #fdfdfd; border: 1.5px solid #f1f2f6; padding: 15px; border-radius: 12px; margin-bottom: 12px; position: relative; }
+        .btn-del { position: absolute; right: -5px; top: -5px; background: var(--danger); color: white; border: none; width: 24px; height: 24px; border-radius: 50%; font-weight: bold; z-index: 5; }
+
+        /* Dashboard Stat */
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .stat-box { background: white; padding: 15px; border-radius: 12px; text-align: center; border-bottom: 4px solid var(--accent); }
+        .stat-box h4 { font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 5px; }
+        .stat-box p { font-size: 1.2rem; font-weight: 900; color: var(--primary); }
+        .history-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; font-size: 0.85rem; }
+
+        .bottom-bar {
+            position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255,255,255,0.95); 
+            backdrop-filter: blur(10px); padding: 15px; box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
+            display: flex; flex-direction: column; gap: 10px; z-index: 1000; border-top: 1px solid #eee;
         }
+        .bar-top { display: flex; justify-content: space-between; align-items: center; width: 100%; padding: 0 5px; }
+        .bar-btns { display: flex; gap: 10px; width: 100%; }
 
-        button {
-            width: 100%; padding: 15px; background: var(--accent); color: white;
-            border: none; border-radius: 12px; font-weight: bold; font-size: 1rem;
-            margin-top: 20px; cursor: pointer; transition: 0.3s;
-        }
-        button:active { transform: scale(0.98); background: #2980b9; }
-
-        /* Preview Display */
-        .preview { background: #fffbe6; border: 1px solid #ffe58f; }
-        .report-text { white-space: pre-wrap; font-size: 0.85rem; line-height: 1.6; }
+        .btn-main { flex: 2; padding: 15px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
+        .btn-copy { flex: 1; padding: 15px; background: var(--success); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
+        .btn-add { background: none; color: var(--accent); border: 2px dashed var(--accent); padding: 12px; border-radius: 12px; width: 100%; font-weight: 700; cursor: pointer; }
+        .status-box { font-size: 0.7rem; text-align: center; color: var(--text-muted); margin-top: 8px; }
     </style>
 </head>
 <body>
 
+<div class="nav-tabs">
+    <button id="tab-input" class="active" onclick="switchTab('input')">INPUT DATA</button>
+    <button id="tab-dash" onclick="switchTab('dashboard')">DASHBOARD</button>
+</div>
+
 <div class="container">
-    <div class="card">
-        <h1>ISI LAPORAN MINGGU RAYA</h1>
-        
-        <div class="input-group">
-            <label>Tgl/Bln:</label>
-            <input type="text" id="tgl" style="width: 150px;" placeholder="Minggu, 26 April">
+    <div id="page-input" class="page active">
+        <div class="header">
+            <h1>KAM DATABASE</h1>
+            <input type="date" id="tgl" class="tgl-input">
+            <div class="status-box" id="report-output">Memuat sistem...</div>
         </div>
 
-        <h3>1. Ibadah Umum Onsite</h3>
-        <div class="input-group"><label>Jibar:</label><input type="number" id="u_jibar" class="calc"></div>
-        <div class="input-group"><label>Tamu:</label><input type="number" id="u_tamu" class="calc"></div>
-        <div class="input-group"><label>PelTu:</label><input type="number" id="u_peltu" class="calc"></div>
-        <div class="input-group"><label>Jemaat:</label><input type="number" id="u_jemaat" class="calc"></div>
-        <div class="total-row"><span>Total Umum:</span><span id="u_total">0</span></div>
-
-        <h3>2. Ibadah Youth Teens</h3>
-        <div class="input-group"><label>Jibar:</label><input type="number" id="yt_jibar" class="calc"></div>
-        <div class="input-group"><label>Jemaat:</label><input type="number" id="yt_jemaat" class="calc"></div>
-        <div class="input-group"><label>PelTu YT:</label><input type="number" id="yt_peltu" class="calc"></div>
-        <div class="total-row"><span>Total YT:</span><span id="yt_total">0</span></div>
-
-        <h3>3. Ibadah Kids Onsite</h3>
-        <div class="input-group"><label>Jibar:</label><input type="number" id="k_jibar" class="calc"></div>
-        <div class="input-group"><label>Jemaat:</label><input type="number" id="k_jemaat" class="calc"></div>
-        <div class="input-group"><label>Pel Anak:</label><input type="number" id="k_pel" class="calc"></div>
-        <div class="total-row"><span>Total Kids:</span><span id="k_total">0</span></div>
-
-        <div class="total-row" style="background: var(--primary); color: white; margin-top: 20px;">
-            <span>GRAND TOTAL JEMAAT:</span><span id="grand_total">0</span>
+        <div class="card">
+            <div class="section-header"><h3>1. IBADAH UMUM ONSITE</h3><span class="badge" id="badge-u">0</span></div>
+            <div class="section-content">
+                <div class="grid-input">
+                    <div class="input-box"><label>Jibar</label><input type="number" id="u_jibar" class="calc" value="0"></div>
+                    <div class="input-box"><label>Tamu</label><input type="number" id="u_tamu" class="calc" value="0"></div>
+                    <div class="input-box"><label>PelTu</label><input type="number" id="u_peltu" class="calc" value="0"></div>
+                    <div class="input-box"><label>Jemaat</label><input type="number" id="u_jemaat" class="calc" value="0"></div>
+                </div>
+            </div>
         </div>
 
-        <button onclick="kirimLaporan()">Update Laporan Ke Teman</button>
+        <div class="card">
+            <div class="section-header"><h3>2. IBADAH YOUTH TEENS</h3><span class="badge" id="badge-yt">0</span></div>
+            <div class="section-content">
+                <div class="grid-input">
+                    <div class="input-box"><label>Jibar YT</label><input type="number" id="yt_jibar" class="calc" value="0"></div>
+                    <div class="input-box"><label>Jemaat YT</label><input type="number" id="yt_jemaat" class="calc" value="0"></div>
+                    <div class="input-box"><label>Peltu YT</label><input type="number" id="yt_peltu" class="calc" value="0"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-header"><h3>3. IBADAH KIDS ONSITE</h3><span class="badge" id="badge-k">0</span></div>
+            <div class="section-content">
+                <div class="grid-input">
+                    <div class="input-box"><label>Jibar Kids</label><input type="number" id="k_jibar" class="calc" value="0"></div>
+                    <div class="input-box"><label>Jemaat Kids</label><input type="number" id="k_jemaat" class="calc" value="0"></div>
+                    <div class="input-box"><label>Kakak Pel Anak</label><input type="number" id="k_pel" class="calc" value="0"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="background: none; border: none; box-shadow: none;">
+            <div class="section-header" style="background: none; border: none;"><h3>4. JIWA BARU (LIST)</h3></div>
+            <div id="jb-container"></div>
+            <button type="button" class="btn-add" onclick="tambahInputJB('', '', '')">+ TAMBAH JIWA BARU</button>
+        </div>
     </div>
 
-    <div class="card preview">
-        <h3>Live Preview (Dilihat Teman)</h3>
-        <div id="report-output" class="report-text">Menunggu data...</div>
+    <div id="page-dashboard" class="page">
+        <div class="header"><h1>Rangkuman Data</h1></div>
+        <div class="stat-grid">
+            <div class="stat-box"><h4>Avg Hadir</h4><p id="dash-avg">0</p></div>
+            <div class="stat-box"><h4>Jiwa Baru</h4><p id="dash-total-jb">0</p></div>
+        </div>
+        <div class="card">
+            <div class="section-header"><h3>KEHADIRAN 5 MINGGU TERAKHIR</h3></div>
+            <div class="section-content" id="dash-history"><div class="status-box">Memuat history...</div></div>
+        </div>
+        <div class="card">
+            <div class="section-header"><h3>DAFTAR SEMUA JIWA BARU</h3></div>
+            <div class="section-content" id="dash-jb-all" style="font-size: 0.8rem;"><div class="status-box">Memuat data...</div></div>
+        </div>
+    </div>
+</div>
+
+<div class="bottom-bar" id="input-bottom-bar">
+    <div class="bar-top">
+        <small style="font-weight: bold; color: var(--text-muted);">TOTAL KESELURUHAN</small>
+        <div style="font-size: 1.4rem; font-weight: 900;" id="grand_total">0</div>
+    </div>
+    <div class="bar-btns">
+        <button class="btn-copy" onclick="salinLaporan()">SALIN</button>
+        <button class="btn-main" onclick="kirimLaporan()">SIMPAN DATA</button>
     </div>
 </div>
 
@@ -117,83 +180,166 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const reportRef = ref(db, 'laporan_ibadah');
 
-    // LOGIKA PERHITUNGAN OTOMATIS
-    const inputs = document.querySelectorAll('.calc');
-    inputs.forEach(input => {
-        input.addEventListener('input', hitungTotal);
-    });
+    const elTgl = document.getElementById('tgl');
+    const elGrandTotal = document.getElementById('grand_total');
+    const elStatus = document.getElementById('report-output');
 
-    function hitungTotal() {
-        const u = Number(document.getElementById('u_jibar').value) + Number(document.getElementById('u_tamu').value) + Number(document.getElementById('u_peltu').value) + Number(document.getElementById('u_jemaat').value);
-        const yt = Number(document.getElementById('yt_jibar').value) + Number(document.getElementById('yt_jemaat').value) + Number(document.getElementById('yt_peltu').value);
-        const k = Number(document.getElementById('k_jibar').value) + Number(document.getElementById('k_jemaat').value) + Number(document.getElementById('k_pel').value);
-        
-        document.getElementById('u_total').innerText = u;
-        document.getElementById('yt_total').innerText = yt;
-        document.getElementById('k_total').innerText = k;
-        document.getElementById('grand_total').innerText = u + yt + k;
-    }
+    elTgl.value = new Date().toISOString().split('T')[0];
 
-    // KIRIM DATA KE FIREBASE
-    window.kirimLaporan = function() {
-        const data = {
-            tgl: document.getElementById('tgl').value || "Minggu, ...",
-            u_jibar: document.getElementById('u_jibar').value || 0,
-            u_tamu: document.getElementById('u_tamu').value || 0,
-            u_peltu: document.getElementById('u_peltu').value || 0,
-            u_jemaat: document.getElementById('u_jemaat').value || 0,
-            u_total: document.getElementById('u_total').innerText,
-            yt_jibar: document.getElementById('yt_jibar').value || 0,
-            yt_jemaat: document.getElementById('yt_jemaat').value || 0,
-            yt_peltu: document.getElementById('yt_peltu').value || 0,
-            yt_total: document.getElementById('yt_total').innerText,
-            k_jibar: document.getElementById('k_jibar').value || 0,
-            k_jemaat: document.getElementById('k_jemaat').value || 0,
-            k_pel: document.getElementById('k_pel').value || 0,
-            k_total: document.getElementById('k_total').innerText,
-            grand_total: document.getElementById('grand_total').innerText
-        };
-
-        set(reportRef, data).then(() => alert("Laporan Terkirim!"));
+    window.switchTab = function(tab) {
+        document.querySelectorAll('.page, .nav-tabs button').forEach(el => el.classList.remove('active'));
+        if(tab === 'input') {
+            document.getElementById('page-input').classList.add('active');
+            document.getElementById('tab-input').classList.add('active');
+            document.getElementById('input-bottom-bar').style.display = 'flex';
+        } else {
+            document.getElementById('page-dashboard').classList.add('active');
+            document.getElementById('tab-dash').classList.add('active');
+            document.getElementById('input-bottom-bar').style.display = 'none';
+            loadDashboard();
+        }
     };
 
-    // TERIMA DATA LIVE
-    onValue(reportRef, (snapshot) => {
-        const d = snapshot.val();
-        if (d) {
-            const formatLaporan = `*Laporan Ibadah Minggu Raya GKA Manado*
+    window.tambahInputJB = function(nama, wa, alamat) {
+        const container = document.getElementById('jb-container');
+        const div = document.createElement('div');
+        div.className = 'jb-item';
+        div.innerHTML = `<button class="btn-del" onclick="this.parentElement.remove(); hitungTotal();">×</button>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <input type="text" class="jb-nama" placeholder="Nama Jiwa Baru" value="${nama}">
+                <input type="text" class="jb-wa" placeholder="Nomor WA" value="${wa}">
+                <input type="text" class="jb-alamat" placeholder="Alamat Lengkap" value="${alamat || ''}">
+            </div>`;
+        container.appendChild(div);
+    };
+
+    window.hitungTotal = function() {
+        const u = getVal('u_jibar') + getVal('u_tamu') + getVal('u_peltu') + getVal('u_jemaat');
+        const yt = getVal('yt_jibar') + getVal('yt_jemaat') + getVal('yt_peltu');
+        const k = getVal('k_jibar') + getVal('k_jemaat') + getVal('k_pel');
+        document.getElementById('badge-u').innerText = u;
+        document.getElementById('badge-yt').innerText = yt;
+        document.getElementById('badge-k').innerText = k;
+        elGrandTotal.innerText = u + yt + k;
+    }
+
+    function getVal(id) { return Number(document.getElementById(id).value || 0); }
+    document.querySelectorAll('.calc').forEach(el => el.addEventListener('input', hitungTotal));
+
+    elTgl.addEventListener('change', () => {
+        const key = elTgl.value; if(!key) return;
+        elStatus.innerText = "Sinkronisasi database...";
+        onValue(ref(db, 'laporan_mingguan/' + key), (s) => {
+            const d = s.val();
+            document.getElementById('jb-container').innerHTML = "";
+            if(d) {
+                const ids = ['u_jibar','u_tamu','u_peltu','u_jemaat','yt_jibar','yt_jemaat','yt_peltu','k_jibar','k_jemaat','k_pel'];
+                ids.forEach(id => document.getElementById(id).value = d[id] || 0);
+                if(d.jiwa_baru) d.jiwa_baru.forEach(j => tambahInputJB(j.nama, j.wa, j.alamat));
+                elStatus.innerText = "Data berhasil dimuat.";
+            } else {
+                const ids = ['u_jibar','u_tamu','u_peltu','u_jemaat','yt_jibar','yt_jemaat','yt_peltu','k_jibar','k_jemaat','k_pel'];
+                ids.forEach(id => document.getElementById(id).value = 0);
+                elStatus.innerText = "Data baru (kosong).";
+            }
+            hitungTotal();
+        }, { onlyOnce: true });
+    });
+
+    function loadDashboard() {
+        onValue(ref(db, 'laporan_mingguan'), (snapshot) => {
+            const data = snapshot.val();
+            if(!data) return;
+            const dates = Object.keys(data).sort().reverse();
+            let htmlH = "", totalK = 0, totalJB = 0, jbAllHtml = "";
+            dates.forEach((date, index) => {
+                const item = data[date];
+                const g = Number(item.grand_total || 0);
+                if(index < 5) htmlH += `<div class="history-item"><span><b>${date}</b></span><span style="color:var(--accent); font-weight:bold">${g} Org</span></div>`;
+                totalK += g;
+                if(item.jiwa_baru) {
+                    totalJB += item.jiwa_baru.length;
+                    item.jiwa_baru.forEach(jb => {
+                        jbAllHtml += `<div class="history-item"><span>${jb.nama}</span><span style="color:var(--text-muted)">${date}</span></div>`;
+                    });
+                }
+            });
+            document.getElementById('dash-history').innerHTML = htmlH;
+            document.getElementById('dash-jb-all').innerHTML = jbAllHtml;
+            document.getElementById('dash-avg').innerText = Math.round(totalK / dates.length);
+            document.getElementById('dash-total-jb').innerText = totalJB;
+        }, { onlyOnce: true });
+    }
+
+    window.salinLaporan = function() {
+        const d = new Date(elTgl.value);
+        const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+        const tglIndo = d.toLocaleDateString('id-ID', options);
+
+        const uT = getVal('u_jibar') + getVal('u_tamu') + getVal('u_peltu') + getVal('u_jemaat');
+        const ytT = getVal('yt_jibar') + getVal('yt_jemaat') + getVal('yt_peltu');
+        const kT = getVal('k_jibar') + getVal('k_jemaat') + getVal('k_pel');
+
+        let jbText = "";
+        document.querySelectorAll('.jb-item').forEach((it, i) => {
+            const n = it.querySelector('.jb-nama').value;
+            const w = it.querySelector('.jb-wa').value;
+            const a = it.querySelector('.jb-alamat').value;
+            if(n) jbText += `\n${i+1}. ${n} | WA: ${w || '-'} | Alamat: ${a || '-'}`;
+        });
+
+        const teks = `Laporan  Ibadah Minggu Raya
+GKA Manado*
 pk 10.00 (pagi) dan pk. 14.00
-tgl/bln : ${d.tgl}
+tgl/bln : ${tglIndo}
 
 *1. Ibadah Umum Onsite*
-- Jumlah Jibar : ${d.u_jibar} org
-- Jumlah Tamu : ${d.u_tamu} org
-- Jumlah PelTu : ${d.u_peltu} org
-- Jumlah Jemaat : ${d.u_jemaat} org
-Total jumlah : ${d.u_total} org
+- Jumlah Jibar : ${getVal('u_jibar')} org
+- Jumlah Tamu : ${getVal('u_tamu')} org
+- Jumlah PelTu : ${getVal('u_peltu')} org
+- Jumlah Jemaat : ${getVal('u_jemaat')} org
+Total jumlah : ${uT}  org
 
 *2. Ibadah Youth Teens*
-- Jumlah Jibar : ${d.yt_jibar} org
-- Jumlah Jemaat : ${d.yt_jemaat} org
-- Jumlah Peltu YT : ${d.yt_peltu} org
-Total jumlah : ${d.yt_total} org
+- Jumlah Jibar : ${getVal('yt_jibar')} org
+- Jumlah Jemaat : ${getVal('yt_jemaat')} org
+- Jumlah Peltu YT : ${getVal('yt_peltu')} org
+Total jumlah : ${ytT} org
 
 *3. Ibadah Kids Onsite*
-- Jumlah Jibar : ${d.k_jibar} org
-- Jumlah Jemaat : ${d.k_jemaat} org
-- Kakak Pel Anak : ${d.k_pel} org
-Total jumlah : ${d.k_total} org
+- Jumlah Jibar : ${getVal('k_jibar')} org
+- Jumlah Jemaat : ${getVal('k_jemaat')} org
+- Kakak Pel Anak : ${getVal('k_pel')} org
+Total jumlah : ${kT} org
 
-*Total Ibadah Umum, YT, Kids : ${d.grand_total} jemaat*
-
+Total Ibadah Umum, Youth Teens, Kids : ${elGrandTotal.innerText} jemaat
+${jbText ? '\n*Daftar Jiwa Baru:*' + jbText + '\n' : ''}
 Tuhan Yesus memberkati`;
 
-            document.getElementById('report-output').innerText = formatLaporan;
-        }
-    });
-</script>
+        navigator.clipboard.writeText(teks).then(() => alert("✅ Berhasil disalin!"));
+    };
 
+    window.kirimLaporan = function() {
+        const key = elTgl.value; if(!key) return alert("Pilih tanggal!");
+        const jbList = [];
+        document.querySelectorAll('.jb-item').forEach(it => {
+            const n = it.querySelector('.jb-nama').value;
+            const w = it.querySelector('.jb-wa').value;
+            const a = it.querySelector('.jb-alamat').value;
+            if(n) jbList.push({ nama: n, wa: w, alamat: a });
+        });
+        const data = {
+            tgl: key,
+            u_jibar: getVal('u_jibar'), u_tamu: getVal('u_tamu'), u_peltu: getVal('u_peltu'), u_jemaat: getVal('u_jemaat'),
+            yt_jibar: getVal('yt_jibar'), yt_jemaat: getVal('yt_jemaat'), yt_peltu: getVal('yt_peltu'),
+            k_jibar: getVal('k_jibar'), k_jemaat: getVal('k_jemaat'), k_pel: getVal('k_pel'),
+            grand_total: elGrandTotal.innerText, jiwa_baru: jbList
+        };
+        set(ref(db, 'laporan_mingguan/' + key), data).then(() => alert("✅ Data Tersimpan!"));
+    };
+
+    elTgl.dispatchEvent(new Event('change'));
+</script>
 </body>
 </html>
